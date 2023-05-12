@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>text suggetion</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.2/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <div id="app" class="container-fluid">
+        <div class="row">
+            <div class="col-12 text-center pt-5">
+                <br><br><br>
+                <h1>Text Suggestion Demonstration</h1>
+                <br><br><br>
+            </div>
+            <div class="col-3"></div>
+            <div class="col-6">
+                <div class="input-group mb-3">
+                    <input type="text" v-model="search_text" class="form-control" placeholder="Enter search word" aria-label="Enter search word" aria-describedby="button-addon2">
+                    <button class="btn btn-primary" :disabled="search_text.length===0 || search_text.split(' ').length<4" type="button" id="button-addon2" @click="searchWords()"><ion-icon style="position: relative;top:3px;" name="search-outline"></ion-icon> Search</button>
+                </div>
+                <span class="text-secondary">Please enter combnination of 4 words.</span>
+                <br><br>
+            </div>
+            <div class="col-12"></div>
+            <div class="col-3"></div>
+            <div class="col-6">
+                <b>Search Combinations:</b> <br>
+                <ul class="list-inline" v-if="results && results.length>0">
+                    <li v-for="(item, idx) in results" :key="idx">{{item}}</li>
+                </ul>
+                <span class="text-danger" v-else-if="results && results.length===0">No search results found with words combination, Please enter another combination.</span>
+                <span class="text-secondary" v-else-if="search_text.length===0">Please enter search words.</span>
+                <span class="text-secondary" v-else>Please click on search.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        createApp({
+            data() {
+                return {
+                    search_text: "",
+                    results: null
+                }
+            },
+            methods: {
+                searchWords() {
+                    const that = this;
+                    axios.post('/word/', {
+                        search_text: that.search_text
+                    })
+                    .then(function (response) {
+                        that.results = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                        that.results = [];
+                    });
+                }
+            }
+        }).mount('#app')
+    </script>
+    <style>
+        .list-inline li {
+            border-bottom: 1px solid #dedede;
+            padding: 10px 5px;
+            cursor: pointer;
+        }
+        .list-inline li:hover {
+            background-color: #efefef;
+        }
+    </style>
+</body>
+
+</html>
